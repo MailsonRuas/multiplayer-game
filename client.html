@@ -23,7 +23,7 @@
             const context=screen.getContext('2d');
             const currentPlayerId='player1';
 
-            const game={
+            const state={
                 players: {
                     'player1': {
                         x: 1,
@@ -42,26 +42,81 @@
                 },
             };
 
-            document.addEventListener('keydown',handleKeydown);
-            function handleKeydown(event){
-                event.preventDefault();
-                const pressedKey=event.key;
-                const player=game.players[currentPlayerId];
-                if(pressedKey==='ArrowUp'&&player.y-1>=0){
-                    player.y--;
-                    return;
+            function createGame(){
+                function movePlayer(command){
+                    console.log(`Moving ${command.playerId} with ${command.pressedKey}`);
+                    const acceptedMoves={
+                        ArrowDown(player){
+                            console.log('baixo');
+                            if(player.y+1<screen.height){
+                                player.y++;
+                                return;
+                            }
+                        },
+                        ArrowUp(player){
+                            console.log('cima');
+                            if(player.y-1>=0){
+                                player.y--;
+                                return;
+                            }
+                        },
+                        ArrowLeft(player){
+                            console.log('esquerda');
+                            if(player.x-1>=0){
+                                player.x--;
+                                return;
+                            }
+                        },
+                        ArrowRight(player){
+                            console.log('direita');
+                            if(player.x+1<screen.width){
+                                player.x++;
+                                return;
+                            }
+                        },
+                    };
+                    const pressedKey=command.pressedKey;
+                    const player=state.players[command.playerId];
+                    const moveFunction=acceptedMoves[pressedKey];
+                    if(moveFunction){
+                        moveFunction(player);
+                    }
                 }
-                if(pressedKey==='ArrowDown'&&player.y+1<screen.height){
-                    player.y++;
-                    return;
+                return {
+                    movePlayer,
+                    state,
+                };
+            }
+
+            const game=createGame();
+            const keyboardListener=createKeyboardListener();
+            keyboardListener.subscribe(game.movePlayer);
+
+            function createKeyboardListener(){
+                const state={
+                    observers: [],
+                };
+                function subscribe(observerFunction){
+                    state.observers.push(observerFunction);
                 }
-                if(pressedKey==='ArrowLeft'&&player.x-1>=0){
-                    player.x--;
-                    return;
+                function notifyAll(command){
+                    console.log(`Notifying ${state.observers.length}`);
+                    for(const observerFunction of state.observers){
+                        observerFunction(command);
+                    }
                 }
-                if(pressedKey==='ArrowRight'&&player.x+1<screen.width){
-                    player.x++;
-                    return;
+                document.addEventListener('keydown',handleKeydown);
+                function handleKeydown(event){
+                    event.preventDefault();
+                    const pressedKey=event.key;
+                    const command={
+                        playerId: 'player1',
+                        pressedKey,
+                    };
+                    notifyAll(command);
+                }
+                return {
+                    subscribe,
                 }
             }
 
@@ -70,13 +125,13 @@
             function renderScreen(){
                 context.fillStyle='white';
                 context.clearRect(0,0,10,10);
-                for(const playerId in game.players){
-                    const player=game.players[playerId];
+                for(const playerId in game.state.players){
+                    const player=game.state.players[playerId];
                     context.fillStyle='black';
                     context.fillRect(player.x,player.y,1,1);
                 }
-                for(const fruitId in game.fruits){
-                    const fruit=game.fruits[fruitId];
+                for(const fruitId in game.state.fruits){
+                    const fruit=game.state.fruits[fruitId];
                     context.fillStyle='green';
                     context.fillRect(fruit.x,fruit.y,1,1);
                 }
