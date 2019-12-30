@@ -1,7 +1,7 @@
-const express=require('express');
-const http=require('http');
-const createGame=require('./public/game');
-const socketio=require('socket.io');
+import express from 'express';
+import http from 'http';
+import createGame from './public/game.js';
+import socketio from 'socket.io';
 
 const app=express();
 const server=http.createServer(app);
@@ -10,16 +10,27 @@ const sockets=socketio(server);
 app.use(express.static('public'));
 
 const game=createGame();
-// game.addPlayer({playerId: 'player1',playerX:0,playerY:0});
-// game.addFruit({fruitId: 'fruit1',fruitX:3,fruitY:3});
-// console.log(game.state);
+game.start();
+
+game.subscribe((comand)=>{
+    sockets.emit(comand.type,comand);
+});
 
 sockets.on('connection',(socket)=>{
+    console.log('connection');
     const playerId=socket.id;
-    console.log('servidor id: ',playerId);
+    game.addPlayer({playerId: playerId});
     socket.emit('setup',game.state);
+    socket.on('disconnect',()=>{
+        game.removePlayer({playerId: playerId});
+    });
+    socket.on('move-player',(comand)=>{
+        comand.playerId=playerId;
+        comand.type='move-player';
+        game.movePlayer(comand);
+    });
 });
 
 server.listen(3000,()=>{
-    console.log('ok');
+    console.log('escutando');
 });
