@@ -33,14 +33,11 @@
             // renderScreen(screen,game,requestAnimationFrame);
             const socket=io();
             socket.on('connect',()=>{
-                console.log('connect');
                 const playerId=socket.id;
-                console.log(`Player connected on Client with id: ${playerId}`);
                 const screen=document.getElementById('screen');
                 renderScreen(screen,game,requestAnimationFrame,playerId);
             });
             socket.on('setup',(state)=>{
-                console.log('setup');
                 const playerId=socket.id;
                 game.setState(state);
                 keyboardListener.registerPlayerId(playerId);
@@ -62,7 +59,6 @@
                 }
             });
             socket.on('add-fruit',(comand)=>{
-                console.log('on add-fruit');
                 game.addFruit(comand);
             });
             socket.on('remove-fruit',(comand)=>{

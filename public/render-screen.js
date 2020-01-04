@@ -13,7 +13,6 @@ export default function renderScreen(screen,game,requestAnimationFrame,currentPl
         context.fillRect(fruit.x,fruit.y,1,1);
     }
     const currentPlayer=game.state.players[currentPlayerId];
-    // console.log(players,currentPlayerId,players[currentPlayerId]);
     if(currentPlayer){
         context.fillStyle='#F0DB4F';
         context.fillRect(currentPlayer.x,currentPlayer.y,1,1);

@@ -17,7 +17,6 @@ game.subscribe((comand)=>{
 });
 
 sockets.on('connection',(socket)=>{
-    console.log('connection');
     const playerId=socket.id;
     game.addPlayer({playerId: playerId});
     socket.emit('setup',game.state);
@@ -33,4 +32,5 @@ sockets.on('connection',(socket)=>{
 
 server.listen(3000,()=>{
     console.log('escutando');
+    return true;
 });

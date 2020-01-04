@@ -29,7 +29,6 @@ export default function createGame(){
     }
 
     function addPlayer(command){
-        console.log('add player');
         const playerId=command.playerId;
         const playerX='playerX' in command?command.playerX:Math.floor(Math.random()*state.screen.width);
         const playerY='playerY' in command?command.playerY:Math.floor(Math.random()*state.screen.height);
@@ -54,7 +53,6 @@ export default function createGame(){
     }
 
     function addFruit(command){
-        console.log('function addFruit');
         const fruitId=command?command.fruitId:Math.floor(Math.random()*10000000000);
         const fruitX=command?command.fruitX:Math.floor(Math.random()*state.screen.width);
         const fruitY=command?command.fruitY:Math.floor(Math.random()*state.screen.height);
@@ -120,9 +118,7 @@ export default function createGame(){
         const player=state.players[playerId];
         for(const fruitId in state.fruits){
             const fruit=state.fruits[fruitId];
-            // console.log(`checando ${playerId} e ${fruitId}`);
             if(player.x===fruit.x&player.y===fruit.y){
-                // console.log('colisão');
                 removeFruit({fruitId:fruitId});
             }
         }
